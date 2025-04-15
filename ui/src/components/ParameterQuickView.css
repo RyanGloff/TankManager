@@ -1,0 +1,20 @@
+.parameter-quick-view {
+  display: inline-block;
+  text-align: center;
+  position: relative;
+}
+
+h1 {
+  font-weight: normal;
+}
+
+.limits {
+  position: absolute;
+  bottom: 5%;
+  font-size: 1.5em;
+  transform: translateX(-50%);
+}
+
+.limits span:first-child {
+  margin-right: 7rem;
+}

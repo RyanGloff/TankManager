@@ -1,0 +1,26 @@
+.quick-view {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  width: 50%;
+}
+
+.parameter-quick-view {
+  width: 100%;
+}
+
+.tank-selector {
+  grid-column: span 12;
+}
+
+.parameter-quick-view[data-parameter="Temperature"],
+.parameter-quick-view[data-parameter="Ph"],
+.parameter-quick-view[data-parameter="Nitrate"],
+.parameter-quick-view[data-parameter="Phosphate"] {
+  grid-column: span 3;
+}
+
+.parameter-quick-view[data-parameter="Alkalinity"],
+.parameter-quick-view[data-parameter="Calcium"],
+.parameter-quick-view[data-parameter="Magnesium"] {
+  grid-column: span 4;
+}

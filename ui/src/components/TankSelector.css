@@ -1,0 +1,17 @@
+.tank-selector {
+  width: 100%;
+  padding: 0.25em;
+  background: var(--base-clr-100);
+  border-radius: 99999px;
+  border: solid var(--base-clr-300) 1px;
+  color: var(--base-clr-300);
+  font-size: 2em;
+  text-align: center;
+  -moz-appearance: none;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.tank-selector:focus-visible {
+  outline: none;
+}

@@ -1,0 +1,23 @@
+.arc {
+  margin: auto;
+  display: block;
+}
+
+.arc-bar {
+  fill: none;
+  stroke: var(--base-clr-200);
+  stroke-width: 2px;
+  stroke-linecap: round;
+}
+
+.arc-fill {
+  fill: none;
+  stroke-width: 5px;
+  stroke-linecap: round;
+}
+
+.limit {
+  fill: var(--base-clr-200);
+  font-size: 10px;
+  text-anchor: middle;
+}

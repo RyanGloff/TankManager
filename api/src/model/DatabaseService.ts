@@ -67,11 +67,11 @@ export class DatabaseService<T, CreateType, UpdateType> {
     if (!DatabaseService.pool) {
       dotenv.config();
       const config = {
-        username: process.env.PG_USERNAME,
-        password: process.env.PG_PASSWORD,
-        host: process.env.PG_HOST,
-        port: process.env.PG_PORT || 5432,
-        database: process.env.PG_DATABASE,
+        username: process.env.DB_USER,
+        password: process.env.DB_PASSWORD,
+        host: process.env.DB_HOST,
+        port: Number(process.env.DB_PORT) || 5432,
+        database: process.env.DB_NAME,
       };
       console.log(
         `Starting up pg connection pool with config: ${JSON.stringify(config)}`,

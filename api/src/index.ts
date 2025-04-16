@@ -9,7 +9,7 @@ dotenv.config();
 
 function main() {
   const app = express();
-  const PORT = process.env.SERVER_PORT || 8080;
+  const PORT = Number(process.env.API_PORT) || 8080;
   const API_BASE_PATH = process.env.API_BASE_PATH || "/api/";
 
   app.use(express.json());

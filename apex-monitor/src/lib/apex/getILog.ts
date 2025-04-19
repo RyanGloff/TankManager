@@ -106,7 +106,7 @@ export async function getILog(
   password: string,
   startDay: string,
   numDays?: number,
-): ILogResponse {
+): Promise<ILogResponse> {
   const { connectSid } = await getConnectSid(host, username, password);
   const url = `http://${host}/rest/ilog?days=${numDays || 7}&sdate=${startDay}&_=${Date.now()}`;
   const response = await fetch(url, {

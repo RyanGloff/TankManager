@@ -1,7 +1,12 @@
 import { Router, Request, Response } from "express";
 import { ParsedQs } from "qs";
-import { DatabaseService, NotFoundError } from "../model/DatabaseService";
+import {
+  AlreadyExistsError,
+  DatabaseService,
+  NotFoundError,
+} from "../model/DatabaseService";
 import { ZodError, ZodSchema } from "zod";
+import { DatabaseError } from "pg";
 
 export enum RouterMethod {
   Create,
@@ -42,6 +47,12 @@ export function handleNotFound(res: Response, err: NotFoundError | string) {
       error: { message: err },
     });
   }
+}
+
+export function handleAlreadyExists(res: Response, err: AlreadyExistsError) {
+  res.status(409).json({
+    error: { message: err.message },
+  });
 }
 
 export function handleBadRequest(res: Response, message: string) {
@@ -180,6 +191,10 @@ export function EntityRouter<T, CreateType, UpdateType>(
         try {
           res.json(await dbService.create(validation));
         } catch (err) {
+          if (err instanceof AlreadyExistsError) {
+            handleAlreadyExists(res, err);
+            return;
+          }
           handleUnexpectedError(res, err);
         }
       });

@@ -324,5 +324,13 @@
     </insert>
   </changeSet>
 
+  <changeSet id="2025-04-17-add-duplicate-insert-unique-constraint" author="Ryan Gloff">
+    <addUniqueConstraint
+      schemaName="tank_data_schema"
+      tableName="parameter_reading"
+      columnNames="tank_id, parameter_id, time"
+      constraintName="unique_parameter_reading_tank_parameter_time" />
+  </changeSet>
+
 </databaseChangeLog>
 

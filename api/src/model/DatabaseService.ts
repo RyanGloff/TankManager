@@ -33,6 +33,13 @@ export class DatabaseError extends Error {
   }
 }
 
+export class AlreadyExistsError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "AlreadyExistsError";
+  }
+}
+
 export class NotFoundError extends DatabaseError {
   constructor(entity: string, id: number) {
     super(`${entity} with id ${id} not found`);
@@ -119,6 +126,10 @@ export class DatabaseService<T, CreateType, UpdateType> {
       const result = await DatabaseService.pool.query(query, values);
       return this.toApi(result.rows[0]);
     } catch (err) {
+      console.log(JSON.stringify(err));
+      if ((err as { detail: string }).detail.includes("already exists")) {
+        throw new AlreadyExistsError(`${this.entityName} already exists`);
+      }
       throw new DatabaseError(`Failed to create ${this.entityName}`, err);
     }
   }

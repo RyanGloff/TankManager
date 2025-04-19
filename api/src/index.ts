@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import { dateParserMiddleware } from "./middleware/dateParserMiddleware";
 import * as dotenv from "dotenv";
+import morgan from "morgan";
 
 import createApiRouter from "./routers/ApiRouter";
 
@@ -15,6 +16,7 @@ function main() {
   app.use(express.json());
   app.use(cors());
   app.use(dateParserMiddleware);
+  app.use(morgan("tiny"));
 
   const apiRouter = createApiRouter();
   app.use(API_BASE_PATH, apiRouter);

@@ -1,4 +1,5 @@
 import z from "zod";
+import { apiGet } from "./ApiCall";
 
 export type ParameterReading = {
   id: number;
@@ -24,20 +25,10 @@ export async function fetchLatestParameterReading(options: {
   tankId: number;
   parameterId: number;
 }): Promise<ParameterReading | null> {
-  return fetch(
-    `http://192.168.55.12:8080/api/parameter-readings/latest?tankId=${options.tankId}&parameterId=${options.parameterId}`,
-  ).then(async (response) => {
-    if (!response.ok) {
-      if (response.status === 404) {
-        return null;
-      }
-      throw new Error(`Request returned error code: ${response.status}`);
-    }
-
-    const raw = await response.json();
-    const result = ParameterReadingSchema.parse(raw);
-    return result;
-  });
+  return await apiGet<ParameterReading | null>(
+    `/parameter-readings/latest?tankId=${options.tankId}&parameterId=${options.parameterId}`,
+    ParameterReadingSchema.nullable(),
+  );
 }
 
 export async function fetchParameterReadingHistory(options: {
@@ -45,14 +36,8 @@ export async function fetchParameterReadingHistory(options: {
   parameterId: number;
   numDays: number;
 }): Promise<ParameterReading[]> {
-  return fetch(
-    `http://192.168.55.12:8080/api/parameter-readings/history?tankId=${options.tankId}&parameterId=${options.parameterId}&numDays=${options.numDays}`,
-  ).then(async (response) => {
-    if (!response.ok) {
-      throw new Error(`Request returned error code: ${response.status}`);
-    }
-    const raw = await response.json();
-    const result = ParameterReadingArraySchema.parse(raw);
-    return result;
-  });
+  return await apiGet<ParameterReading[]>(
+    `/parameter-readings/history?tankId=${options.tankId}&parameterId=${options.parameterId}&numDays=${options.numDays}`,
+    ParameterReadingArraySchema,
+  );
 }

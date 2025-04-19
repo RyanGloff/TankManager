@@ -1,4 +1,5 @@
 import z from "zod";
+import { apiGet } from "./ApiCall";
 
 export type Tank = {
   id: number;
@@ -15,12 +16,5 @@ const TankSchema = z.object({
 const TankArraySchema = z.array(TankSchema);
 
 export async function fetchTanks(): Promise<Tank[]> {
-  return fetch("http://192.168.55.12:8080/api/tanks").then(async (response) => {
-    if (!response.ok) {
-      throw new Error(`Request returned error code: ${response.status}`);
-    }
-
-    const raw = await response.json();
-    return TankArraySchema.parse(raw);
-  });
+  return await apiGet<Tank[]>("/tanks", TankArraySchema);
 }

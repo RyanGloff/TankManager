@@ -1,6 +1,10 @@
 import { ZodSchema } from "zod";
 
-const baseUrl = `http://${process.env.API_HOST}:${process.env.API_PORT}${process.env.API_BASE_PATH}`;
+const apiHost = import.meta.env.VITE_API_HOST;
+const apiPort = import.meta.env.VITE_API_PORT;
+const apiBasePath = import.meta.env.VITE_API_BASE_PATH;
+
+const baseUrl = `http://${apiHost}:${apiPort}${apiBasePath}`;
 
 export class AlreadyExistsError extends Error {
   constructor(message: string) {

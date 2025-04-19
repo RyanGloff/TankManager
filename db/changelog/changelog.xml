@@ -319,7 +319,7 @@
     <insert tableName="parameter_goal" schemaName="tank_data_schema">
       <column name="tank_id" value="1" />
       <column name="parameter_id" value="7" />
-      <column name="low_limit" value="0.3" />
+      <column name="low_limit" value="0.03" />
       <column name="high_limit" value="0.1" />
     </insert>
   </changeSet>

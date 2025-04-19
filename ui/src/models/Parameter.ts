@@ -1,4 +1,5 @@
 import z from "zod";
+import { apiGet } from "./ApiCall";
 
 export type Parameter = {
   id: number;
@@ -15,14 +16,5 @@ const ParameterSchema = z.object({
 const ParameterArraySchema = z.array(ParameterSchema);
 
 export async function fetchParameters(): Promise<Parameter[]> {
-  return fetch("http://192.168.55.12:8080/api/parameters").then(
-    async (response) => {
-      if (!response.ok) {
-        throw new Error(`Request returned error code: ${response.status}`);
-      }
-
-      const raw = await response.json();
-      return ParameterArraySchema.parse(raw);
-    },
-  );
+  return await apiGet<Parameter[]>("/parameters", ParameterArraySchema);
 }

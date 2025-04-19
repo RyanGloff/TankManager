@@ -33,7 +33,5 @@ export function dateParserMiddleware(
     req.body = convertTimestampsToDate(req.body);
   }
 
-  console.log(req.body);
-
   next();
 }

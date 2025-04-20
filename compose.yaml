@@ -2,6 +2,7 @@ services:
   postgres:
     image: postgres:16
     container_name: db
+    restart: unless-stopped
     environment:
       POSTGRES_DB: ${DB_NAME}
       POSTGRES_USER: ${DB_USER}
@@ -37,6 +38,7 @@ services:
       context: ./api
       dockerfile: Dockerfile
     container_name: api
+    restart: unless-stopped
     ports:
       - "${VITE_API_PORT}:${VITE_API_PORT}"
     depends_on:
@@ -56,6 +58,7 @@ services:
       context: ./apex-monitor
       dockerfile: Dockerfile
     container_name: apex-monitor
+    restart: unless-stopped
     depends_on:
       - api
     environment:
@@ -72,6 +75,7 @@ services:
         VITE_API_PORT: ${VITE_API_PORT}
         VITE_API_BASE_PATH: ${VITE_API_BASE_PATH}
     container_name: ui
+    restart: unless-stopped
     ports:
       - "${VITE_UI_PORT}:${VITE_UI_PORT}"
     depends_on:
@@ -84,7 +88,7 @@ services:
   grafana:
     image: grafana/grafana-enterprise
     container_name: grafana
-    restart: always
+    restart: unless-stopped
     ports:
       - "${GRAFANA_PORT}:${GRAFANA_PORT}"
     environment:

@@ -14,6 +14,8 @@ const yymmddSchema = z
     return new Date(year, month, day);
   });
 
+const timestampSchema = z.number().transform((val) => new Date(val * 1000));
+
 const TLogResponseSchema = z.object({
   tlog: z.object({
     hostname: z.string(),
@@ -39,7 +41,7 @@ const TLogResponseSchema = z.object({
     timezone: z.string(),
     record: z.array(
       z.object({
-        date: z.coerce.date(),
+        date: timestampSchema,
         did: z.string(),
         value: z.coerce.number(),
         confidence: z.coerce.number(),

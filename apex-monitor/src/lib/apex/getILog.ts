@@ -21,6 +21,8 @@ const yymmddSchema = z
     return new Date(year, month, day);
   });
 
+const timestampSchema = z.number().transform((val) => new Date(val * 1000));
+
 const ILogResponseSchema = z.object({
   ilog: z.object({
     hostname: z.string(),
@@ -41,7 +43,7 @@ const ILogResponseSchema = z.object({
     timezone: z.string(),
     record: z.array(
       z.object({
-        date: z.coerce.date(),
+        date: timestampSchema,
         data: z.array(
           z.object({
             name: z.string(),

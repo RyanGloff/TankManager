@@ -2,6 +2,7 @@ import { Router, Request, Response } from "express";
 import { ParsedQs } from "qs";
 import {
   AlreadyExistsError,
+  Bulk,
   DatabaseService,
   NotFoundError,
 } from "../model/DatabaseService";
@@ -9,6 +10,7 @@ import { ZodError, ZodSchema } from "zod";
 import { DatabaseError } from "pg";
 
 export enum RouterMethod {
+  BulkCreate,
   Create,
   GetById,
   GetAll,
@@ -60,6 +62,33 @@ export function handleBadRequest(res: Response, message: string) {
     error: { message },
   });
 }
+export function validateBody<D>(
+  schema: ZodSchema,
+  req: Request,
+  res: Response,
+): D | null {
+  try {
+    return schema.parse(req.body) as D;
+  } catch (err) {
+    if (err instanceof ZodError) {
+      res.status(400).json({
+        message: "Invalid request body",
+        details: err.errors, // Zod validation error details
+      });
+      return null;
+    }
+    handleUnexpectedError(res, err);
+    return null;
+  }
+}
+
+export function handleBadId(idStr: string, res: Response): void {
+  res.status(400).json({
+    error: {
+      message: `Invalid value for id. id must be a positive integer value. id was ${idStr}`,
+    },
+  });
+}
 
 export function assertQuery(
   name: string,
@@ -85,34 +114,6 @@ export function EntityRouter<T, CreateType, UpdateType>(
   updateEntitySchema: ZodSchema,
 ): Router {
   const router = Router();
-
-  function validateBody<D>(
-    schema: ZodSchema,
-    req: Request,
-    res: Response,
-  ): D | null {
-    try {
-      return schema.parse(req.body) as D;
-    } catch (err) {
-      if (err instanceof ZodError) {
-        res.status(400).json({
-          message: "Invalid request body",
-          details: err.errors, // Zod validation error details
-        });
-        return null;
-      }
-      handleUnexpectedError(res, err);
-      return null;
-    }
-  }
-
-  function handleBadId(idStr: string, res: Response): void {
-    res.status(400).json({
-      error: {
-        message: `Invalid value for id. id must be a positive integer value. id was ${idStr}`,
-      },
-    });
-  }
 
   function getMethodOpts(
     allowedMethods: (RouterMethod | RouterMethodConfig)[],
@@ -190,6 +191,26 @@ export function EntityRouter<T, CreateType, UpdateType>(
         if (validation === null) return;
         try {
           res.json(await dbService.create(validation));
+        } catch (err) {
+          if (err instanceof AlreadyExistsError) {
+            handleAlreadyExists(res, err);
+            return;
+          }
+          handleUnexpectedError(res, err);
+        }
+      });
+    }
+
+    if (methodIsAllowed(allowedMethods, RouterMethod.BulkCreate)) {
+      router.post("/", async (req, res) => {
+        const validation = validateBody<Bulk<CreateType>>(
+          createEntitySchema,
+          req,
+          res,
+        );
+        if (validation === null) return;
+        try {
+          res.json(await dbService.bulkCreate(validation));
         } catch (err) {
           if (err instanceof AlreadyExistsError) {
             handleAlreadyExists(res, err);

@@ -52,6 +52,10 @@ export type Transformation = {
   apiName: string;
 };
 
+export type Bulk<T> = {
+  values: T[];
+};
+
 export class DatabaseService<T, CreateType, UpdateType> {
   protected static pool: Pool;
 
@@ -130,6 +134,34 @@ export class DatabaseService<T, CreateType, UpdateType> {
         throw new AlreadyExistsError(`${this.entityName} already exists`);
       }
       throw new DatabaseError(`Failed to create ${this.entityName}`, err);
+    }
+  }
+
+  async bulkCreate(data: Bulk<CreateType>): Promise<T[]> {
+    if (data.values.length === 0) return [];
+    const dbRows = data.values.map((d) => this.toDb(d));
+    const keys = Array.from(new Set(dbRows.flatMap(Object.keys)));
+    const values: any[] = [];
+    const rowsPlaceholders = dbRows.map((row, rowIndex) => {
+      const rowValues = keys.map((key) => row[key] ?? null);
+      values.push(...rowValues);
+      const offset = rowIndex * keys.length;
+      const placeholders = rowValues.map((_, i) => `$${offset + i + 1}`);
+      return `(${placeholders.join(", ")})`;
+    });
+
+    const query = `
+    INSERT INTO ${this.tableName} (${keys.join(", ")})
+    VALUES ${rowsPlaceholders.join(", ")}
+    ON CONFLICT DO NOTHING
+    RETURNING *;
+  `;
+
+    try {
+      const result = await DatabaseService.pool.query(query, values);
+      return result.rows.map((row) => this.toApi(row));
+    } catch (err) {
+      throw new DatabaseError(`Failed to bulk create ${this.entityName}`, err);
     }
   }
 

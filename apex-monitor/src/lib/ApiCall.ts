@@ -8,7 +8,12 @@ export class AlreadyExistsError extends Error {
   }
 }
 
+export type Bulk<T> = {
+  values: T[];
+};
+
 export async function apiGet<T>(path: string, schema: ZodSchema): Promise<T> {
+  console.log(`GET ${baseUrl}${path}`);
   const response = await fetch(`${baseUrl}${path}`);
 
   if (!response.ok) {
@@ -23,11 +28,12 @@ export async function apiGet<T>(path: string, schema: ZodSchema): Promise<T> {
   return body as T;
 }
 
-export async function apiPost<T>(
+export async function apiPost<T, R>(
   path: string,
   body: T,
   schema: ZodSchema,
-): Promise<T> {
+): Promise<R> {
+  console.log(`POST ${baseUrl}${path}`);
   const response = await fetch(`${baseUrl}${path}`, {
     method: "POST",
     headers: {

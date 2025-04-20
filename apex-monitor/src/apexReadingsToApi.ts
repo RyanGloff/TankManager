@@ -2,7 +2,7 @@ import { getAllApexParameterReadings } from "./lib/apex/getAllApexParameterReadi
 import { getTanks, Tank } from "./lib/Tank";
 import { getParameters, Parameter } from "./lib/Parameter";
 import {
-  storeParameterReading,
+  storeParameterReadingBulk,
   ParameterReading,
 } from "./lib/ParameterReading";
 import getStartDay from "./lib/apex/getStartDay";
@@ -44,22 +44,21 @@ async function sendApexReadingsToApiForTank(
   console.log(
     `Found ${apexData.length} apex readings on tank [${tank.id}] ${tank.name}`,
   );
-  const results = (
-    await Promise.all(
-      apexData.map((reading) => {
-        const parameterId = parameters.get(reading.parameter)?.id;
-        if (!parameterId) return;
-        const parameterReading: ParameterReading = {
-          tankId: tank.id as number,
-          parameterId: parameterId,
-          value: reading.value,
-          time: reading.time,
-          showInDashboard: true,
-        };
-        return storeParameterReading(parameterReading);
-      }),
-    )
-  ).reduce(
+
+  const values = apexData
+    .map((reading): ParameterReading | undefined => {
+      const parameterId = parameters.get(reading.parameter)?.id;
+      if (!parameterId) return;
+      return {
+        tankId: tank.id as number,
+        parameterId: parameterId,
+        value: reading.value,
+        time: reading.time,
+        showInDashboard: true,
+      };
+    })
+    .filter((v) => v !== undefined);
+  const results = (await storeParameterReadingBulk({ values: values })).reduce(
     (agg: StoreRes, curr: ParameterReading | null | undefined): StoreRes => {
       if (curr === undefined) return agg;
       agg.total++;

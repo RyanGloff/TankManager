@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { apiPost, AlreadyExistsError } from "./ApiCall";
+import { apiPost, AlreadyExistsError, Bulk } from "./ApiCall";
 
 export type ParameterReading = {
   id?: number;
@@ -23,7 +23,7 @@ export async function storeParameterReading(
   pr: ParameterReading,
 ): Promise<ParameterReading | null> {
   try {
-    return await apiPost<ParameterReading>(
+    return await apiPost<ParameterReading, ParameterReading>(
       "/parameter-readings",
       pr,
       ParameterReadingSchema,
@@ -34,4 +34,15 @@ export async function storeParameterReading(
     }
     throw err;
   }
+}
+
+export async function storeParameterReadingBulk(
+  prs: Bulk<ParameterReading>,
+): Promise<ParameterReading[]> {
+  // Not catching errors, Let them be caught up a level
+  return await apiPost<Bulk<ParameterReading>, ParameterReading[]>(
+    "/parameter-readings/bulk",
+    prs,
+    z.array(ParameterReadingSchema),
+  );
 }

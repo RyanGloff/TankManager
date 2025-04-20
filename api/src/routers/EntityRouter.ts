@@ -202,7 +202,7 @@ export function EntityRouter<T, CreateType, UpdateType>(
     }
 
     if (methodIsAllowed(allowedMethods, RouterMethod.BulkCreate)) {
-      router.post("/", async (req, res) => {
+      router.post("/bulk", async (req, res) => {
         const validation = validateBody<Bulk<CreateType>>(
           createEntitySchema,
           req,

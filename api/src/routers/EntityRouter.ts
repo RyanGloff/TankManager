@@ -6,7 +6,7 @@ import {
   DatabaseService,
   NotFoundError,
 } from "../model/DatabaseService";
-import { ZodError, ZodSchema } from "zod";
+import { z, ZodError, ZodSchema } from "zod";
 import { DatabaseError } from "pg";
 
 export enum RouterMethod {
@@ -202,9 +202,12 @@ export function EntityRouter<T, CreateType, UpdateType>(
     }
 
     if (methodIsAllowed(allowedMethods, RouterMethod.BulkCreate)) {
+      const bulkCreateEntitySchema = z.object({
+        values: z.array(createEntitySchema),
+      });
       router.post("/bulk", async (req, res) => {
         const validation = validateBody<Bulk<CreateType>>(
-          createEntitySchema,
+          bulkCreateEntitySchema,
           req,
           res,
         );

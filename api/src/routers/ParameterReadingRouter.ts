@@ -27,6 +27,7 @@ export default function ParameterReadingRouter() {
   const router = EntityRouter(
     dbService,
     [
+      RouterMethod.BulkCreate,
       RouterMethod.Create,
       {
         method: RouterMethod.GetById,

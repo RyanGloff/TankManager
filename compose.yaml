@@ -40,7 +40,7 @@ services:
     container_name: api
     restart: unless-stopped
     ports:
-      - "${VITE_API_PORT}:${VITE_API_PORT}"
+      - "127.0.0.1:${VITE_API_PORT}:${VITE_API_PORT}"
     depends_on:
       liquibase:
         condition: service_completed_successfully
@@ -77,7 +77,7 @@ services:
     container_name: ui
     restart: unless-stopped
     ports:
-      - "${VITE_UI_PORT}:${VITE_UI_PORT}"
+      - "127.0.0.1:${VITE_UI_PORT}:${VITE_UI_PORT}"
     depends_on:
       - api
     environment:
@@ -90,7 +90,7 @@ services:
     container_name: grafana
     restart: unless-stopped
     ports:
-      - "${GRAFANA_PORT}:${GRAFANA_PORT}"
+      - "127.0.0.1:${GRAFANA_PORT}:${GRAFANA_PORT}"
     environment:
       - GF_SECURITY_ADMIN_USER=admin
       - GF_SECURITY_ADMIN_PASSWORD=admin

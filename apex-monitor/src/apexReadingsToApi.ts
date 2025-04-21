@@ -1,11 +1,11 @@
 import { getAllApexParameterReadings } from "./lib/apex/getAllApexParameterReadings";
 import { getTanks, Tank } from "./lib/Tank";
 import { getParameters, Parameter } from "./lib/Parameter";
+import { getStartDay } from "./lib/apex/apexUtil";
 import {
   storeParameterReadingBulk,
   ParameterReading,
 } from "./lib/ParameterReading";
-import getStartDay from "./lib/apex/getStartDay";
 
 function toMapById<T extends { id?: number }>(data: T[]): Map<number, T> {
   return data.reduce((agg: Map<number, T>, curr: T) => {

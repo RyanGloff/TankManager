@@ -1,5 +1,6 @@
 import fetch from "node-fetch";
 import { getConnectSid } from "./getConnectSid";
+import { timestampSchema, yymmddSchema } from "./apexUtil";
 import { z } from "zod";
 
 const ILogExtraSdStatSchema = z.object({
@@ -8,20 +9,6 @@ const ILogExtraSdStatSchema = z.object({
   readErr: z.coerce.number(),
   writeErr: z.coerce.number(),
 });
-
-const yymmddSchema = z
-  .string()
-  .refine((val) => /^\d{6}$/.test(val), {
-    message: "Invalid date format. Expected YYMMDD.",
-  })
-  .transform((val) => {
-    const year = parseInt(val.slice(0, 2), 10) + 2000;
-    const month = parseInt(val.slice(2, 4), 10) - 1;
-    const day = parseInt(val.slice(4, 6), 10);
-    return new Date(year, month, day);
-  });
-
-const timestampSchema = z.number().transform((val) => new Date(val * 1000));
 
 const ILogResponseSchema = z.object({
   ilog: z.object({

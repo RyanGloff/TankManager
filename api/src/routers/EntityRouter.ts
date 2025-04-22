@@ -181,26 +181,6 @@ export function EntityRouter<T, CreateType, UpdateType>(
       }
     });
 
-    if (methodIsAllowed(allowedMethods, RouterMethod.Create)) {
-      router.post("/", async (req, res) => {
-        const validation = validateBody<CreateType>(
-          createEntitySchema,
-          req,
-          res,
-        );
-        if (validation === null) return;
-        try {
-          res.json(await dbService.create(validation));
-        } catch (err) {
-          if (err instanceof AlreadyExistsError) {
-            handleAlreadyExists(res, err);
-            return;
-          }
-          handleUnexpectedError(res, err);
-        }
-      });
-    }
-
     if (methodIsAllowed(allowedMethods, RouterMethod.BulkCreate)) {
       const bulkCreateEntitySchema = z.object({
         values: z.array(createEntitySchema),
@@ -214,6 +194,26 @@ export function EntityRouter<T, CreateType, UpdateType>(
         if (validation === null) return;
         try {
           res.json(await dbService.bulkCreate(validation));
+        } catch (err) {
+          if (err instanceof AlreadyExistsError) {
+            handleAlreadyExists(res, err);
+            return;
+          }
+          handleUnexpectedError(res, err);
+        }
+      });
+    }
+
+    if (methodIsAllowed(allowedMethods, RouterMethod.Create)) {
+      router.post("/", async (req, res) => {
+        const validation = validateBody<CreateType>(
+          createEntitySchema,
+          req,
+          res,
+        );
+        if (validation === null) return;
+        try {
+          res.json(await dbService.create(validation));
         } catch (err) {
           if (err instanceof AlreadyExistsError) {
             handleAlreadyExists(res, err);

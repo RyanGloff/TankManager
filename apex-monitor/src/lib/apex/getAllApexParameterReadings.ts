@@ -28,6 +28,7 @@ export async function getAllApexParameterReadings(
   password: string,
   startDay: string,
   numDays: number,
+  includeCurrentStatus?: boolean,
 ): Promise<ApexParameterReading[]> {
   const requests = [
     getILog(host, username, password, startDay, numDays),
@@ -63,16 +64,18 @@ export async function getAllApexParameterReadings(
     });
   });
 
-  const time = new Date();
-  status.inputs.map((input) => {
-    const parameterName = apexParameterNameMap.get(input.type);
-    if (!parameterName) return;
-    readings.push({
-      time,
-      parameter: parameterName,
-      value: input.value,
+  if (includeCurrentStatus) {
+    const time = new Date();
+    status.inputs.map((input) => {
+      const parameterName = apexParameterNameMap.get(input.type);
+      if (!parameterName) return;
+      readings.push({
+        time,
+        parameter: parameterName,
+        value: input.value,
+      });
     });
-  });
+  }
 
   return readings;
 }

@@ -32,6 +32,7 @@ async function sendApexReadingsToApiForTank(
   parameters: Map<string, Parameter>,
   numDays?: number,
   startNumDaysAgo?: number,
+  includeCurrentStatus?: boolean,
 ): Promise<{ res: StoreRes; tankId: number } | null> {
   if (!tank.apexHost) return null;
   const apexData = await getAllApexParameterReadings(
@@ -40,6 +41,7 @@ async function sendApexReadingsToApiForTank(
     "1234",
     getStartDay(startNumDaysAgo || numDays || 2),
     numDays || 2,
+    includeCurrentStatus,
   );
   console.log(
     `Found ${apexData.length} apex readings on tank [${tank.id}] ${tank.name}`,
@@ -100,6 +102,7 @@ export async function apexReadingsToApiHistorical(): Promise<
             parameters,
             batchSizeDays,
             currentStartDay,
+            false,
           );
           if (!res) return null;
           workingRes.stored += res.res.stored;
@@ -151,6 +154,7 @@ export async function apexReadingsToApi(
             parameters,
             numDays,
             startNumDaysAgo,
+            true,
           ),
       ),
     )

@@ -9,7 +9,11 @@ async function main() {
   console.log(
     `Starting polling apex readings every ${INTERVAL / 1000} seconds`,
   );
-  await apexReadingsToApiHistorical();
+  try {
+    await apexReadingsToApiHistorical();
+  } catch (err) {
+    console.log(err);
+  }
   setInterval(() => {
     try {
       apexReadingsToApi();

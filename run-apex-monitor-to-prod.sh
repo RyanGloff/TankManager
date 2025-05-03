@@ -1,1 +1,1 @@
-docker compose --env-file prod.env run --no-deps -d apex-monitor
+docker compose --env-file apex-monitor-prod.env run --no-deps -d apex-monitor

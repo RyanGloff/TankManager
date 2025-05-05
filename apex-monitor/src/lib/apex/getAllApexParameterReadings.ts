@@ -66,9 +66,11 @@ export async function getAllApexParameterReadings(
 
   if (includeCurrentStatus) {
     const time = new Date();
-    status.inputs.map((input) => {
+    status.inputs.forEach((input) => {
       const parameterName = apexParameterNameMap.get(input.type);
       if (!parameterName) return;
+      // Only use the parameters that are constantly measured by probes
+      if (!["temperature", "ph"].includes(parameterName)) return;
       readings.push({
         time,
         parameter: parameterName,

@@ -58,7 +58,7 @@ services:
       context: ./apex-monitor
       dockerfile: Dockerfile
     container_name: apex-monitor
-    restart: unless-stopped
+    restart: always
     depends_on:
       - api
     environment:

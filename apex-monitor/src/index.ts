@@ -1,7 +1,5 @@
-import {
-  apexReadingsToApi,
-  apexReadingsToApiHistorical,
-} from "./apexReadingsToApi";
+import { apexReadingsToApi } from "./apexReadingsToApi";
+import { apexReadingsToApiHistorical } from "./apexReadingsToApiHistorical";
 
 const INTERVAL = 1000 * 60;
 

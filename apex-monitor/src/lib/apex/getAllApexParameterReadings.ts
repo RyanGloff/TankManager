@@ -22,6 +22,47 @@ apexParameterNameMap.set("po4", "phosphate");
 apexParameterNameMap.set("3_1", "nitrate");
 apexParameterNameMap.set("no3", "nitrate");
 
+function addILog(iLog: ILogResponse, readings: ApexParameterReading[]) {
+  iLog.ilog.record.forEach((record) => {
+    record.data.forEach((data) => {
+      const parameterName = apexParameterNameMap.get(data.type);
+      if (!parameterName) return;
+      readings.push({
+        time: record.date,
+        parameter: parameterName,
+        value: data.value,
+      });
+    });
+  });
+}
+
+function addTLog(tLog: TLogResponse, readings: ApexParameterReading[]) {
+  tLog.tlog.record.map((record) => {
+    const parameterName = apexParameterNameMap.get(record.did);
+    if (!parameterName) return;
+    readings.push({
+      time: record.date,
+      parameter: parameterName,
+      value: record.value,
+    });
+  });
+}
+
+function addStatus(status: StatusResponse, readings: ApexParameterReading[]) {
+  const time = new Date();
+  status.inputs.forEach((input) => {
+    const parameterName = apexParameterNameMap.get(input.type);
+    if (!parameterName) return;
+    // Only use the parameters that are constantly measured by probes
+    if (!["temperature", "ph"].includes(parameterName)) return;
+    readings.push({
+      time,
+      parameter: parameterName,
+      value: input.value,
+    });
+  });
+}
+
 export async function getAllApexParameterReadings(
   host: string,
   username: string,
@@ -46,44 +87,11 @@ export async function getAllApexParameterReadings(
   const results = await Promise.all(requests);
   const readings: ApexParameterReading[] = [];
 
-  const iLog = results[0] as ILogResponse;
-  iLog.ilog.record.forEach((record) => {
-    record.data.forEach((data) => {
-      const parameterName = apexParameterNameMap.get(data.type);
-      if (!parameterName) return;
-      readings.push({
-        time: record.date,
-        parameter: parameterName,
-        value: data.value,
-      });
-    });
-  });
-
-  const tLog = results[1] as TLogResponse;
-  tLog.tlog.record.map((record) => {
-    const parameterName = apexParameterNameMap.get(record.did);
-    if (!parameterName) return;
-    readings.push({
-      time: record.date,
-      parameter: parameterName,
-      value: record.value,
-    });
-  });
+  addILog(results[0] as ILogResponse, readings);
+  addTLog(results[1] as TLogResponse, readings);
 
   if (includeCurrentStatus) {
-    const status = results[2] as StatusResponse;
-    const time = new Date();
-    status.inputs.forEach((input) => {
-      const parameterName = apexParameterNameMap.get(input.type);
-      if (!parameterName) return;
-      // Only use the parameters that are constantly measured by probes
-      if (!["temperature", "ph"].includes(parameterName)) return;
-      readings.push({
-        time,
-        parameter: parameterName,
-        value: input.value,
-      });
-    });
+    addStatus(results[2] as StatusResponse, readings);
   }
 
   return readings;

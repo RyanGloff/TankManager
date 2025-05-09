@@ -30,18 +30,23 @@ export async function getAllApexParameterReadings(
   numDays: number,
   includeCurrentStatus?: boolean,
 ): Promise<ApexParameterReading[]> {
-  const requests = [
+  const requests: (
+    | Promise<ILogResponse>
+    | Promise<TLogResponse>
+    | Promise<StatusResponse>
+  )[] = [
     getILog(host, username, password, startDay, numDays),
     getTLog(host, username, password, startDay, numDays),
-    getStatus(host, username, password),
   ];
 
+  if (includeCurrentStatus) {
+    requests.push(getStatus(host, username, password));
+  }
+
   const results = await Promise.all(requests);
-  const iLog = results[0] as ILogResponse;
-  const tLog = results[1] as TLogResponse;
-  const status = results[2] as StatusResponse;
   const readings: ApexParameterReading[] = [];
 
+  const iLog = results[0] as ILogResponse;
   iLog.ilog.record.forEach((record) => {
     record.data.forEach((data) => {
       const parameterName = apexParameterNameMap.get(data.type);
@@ -54,6 +59,7 @@ export async function getAllApexParameterReadings(
     });
   });
 
+  const tLog = results[1] as TLogResponse;
   tLog.tlog.record.map((record) => {
     const parameterName = apexParameterNameMap.get(record.did);
     if (!parameterName) return;
@@ -65,6 +71,7 @@ export async function getAllApexParameterReadings(
   });
 
   if (includeCurrentStatus) {
+    const status = results[2] as StatusResponse;
     const time = new Date();
     status.inputs.forEach((input) => {
       const parameterName = apexParameterNameMap.get(input.type);

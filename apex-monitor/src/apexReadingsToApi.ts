@@ -90,6 +90,7 @@ export async function sendApexReadingsToApiForTank(
 export async function apexReadingsToApi(
   numDays?: number,
   startNumDaysAgo?: number,
+  includeCurrentStatus?: boolean,
 ): Promise<Map<number, StoreRes>> {
   const getTanksPromise = getTanks();
   const getParametersPromise = getParameters();
@@ -106,7 +107,7 @@ export async function apexReadingsToApi(
             parameters,
             numDays,
             startNumDaysAgo,
-            true,
+            includeCurrentStatus === undefined ? false : includeCurrentStatus,
           ),
       ),
     )
